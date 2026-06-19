@@ -78,6 +78,14 @@ The `fe-design-refine` skill is the complaint-to-memory loop for frontend work: 
 
 When a grudge skill is in use, harnesses that support background work can run `grudge propose` in a sub-agent while the main task continues. The result is a human-facing curation queue for merge, mechanize, archive, or keep decisions. Every proposal remains advisory until a person approves and applies it.
 
+## Auto-capture (pi)
+
+When `grudge init` installs pi wiring, it also installs the `grudge-capture` pi extension at `.pi/extensions/grudge-capture/index.ts`. The extension listens for pi's `session_shutdown` hook; if the session used edit/write tools, it starts a background pi review and proposes lesson drafts under `lessons/_inbox/`.
+
+Manual install is just copying `assets/pi/extensions/grudge-capture/index.ts` to `.pi/extensions/grudge-capture/index.ts`. Disable it with `GRUDGE_NO_CAPTURE=1`.
+
+Auto-capture is proposal-only: it does not activate, merge, or approve lessons. Each edited session can trigger one background LLM run, so treat it as a convenience with real cost.
+
 ```text
 complaint / failure
         |

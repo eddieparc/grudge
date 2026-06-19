@@ -98,6 +98,7 @@ async function init(argv) {
       manual.push("🔧 codex: copy assets/skills/* to ~/.codex/skills/ or your Codex skills directory.");
     } else if (tool === "pi") {
       ensurePiSettings(installed);
+      installPiCaptureExtension(installed, skipped);
     } else if (tool === "gjc") {
       copySkill("fe-design-refine", "docs/skills/fe-design-refine", installed, skipped);
       copySkill("lessons-extract", "docs/skills/lessons-extract", installed, skipped);
@@ -135,6 +136,11 @@ async function init(argv) {
   console.log("grudge init complete");
   console.log(`installed: ${installed.length ? installed.join(", ") : "none"}`);
   if (skipped.length) console.log(`skipped existing: ${skipped.join(", ")}`);
+  if (tools.includes("pi")) {
+    console.log(
+      "pi 자동 교훈 캡처 설치됨 — 편집 있는 세션 종료 시 백그라운드로 lessons/_inbox/에 교훈 제안. 끄기: GRUDGE_NO_CAPTURE=1. (세션당 1회 LLM 실행 비용)",
+    );
+  }
   console.log("next: grudge lint");
   console.log("next: /skill:fe-design-refine");
   for (const line of manual) console.log(line);
@@ -172,6 +178,17 @@ function copySkill(name, dest, installed, skipped) {
   }
   mkdirSync(dirname(dest), { recursive: true });
   cpSync(join(root, "assets/skills", name), dest, { recursive: true });
+  installed.push(dest);
+}
+
+function installPiCaptureExtension(installed, skipped) {
+  const dest = ".pi/extensions/grudge-capture/index.ts";
+  if (existsSync(dest)) {
+    skipped.push(dest);
+    return;
+  }
+  mkdirSync(dirname(dest), { recursive: true });
+  cpSync(join(root, "assets/pi/extensions/grudge-capture/index.ts"), dest);
   installed.push(dest);
 }
 

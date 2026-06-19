@@ -78,6 +78,14 @@ grudge는 세 층으로 움직인다:
 
 grudge 스킬 사용 중 백그라운드 작업을 지원하는 하네스는 메인 작업을 막지 않고 sub-agent에서 `grudge propose`를 실행할 수 있다. 결과는 merge, mechanize, archive, keep 결정을 위한 사람용 큐레이션 큐다. 모든 제안은 사람이 승인하고 적용하기 전까지 advisory다.
 
+## Auto-capture (pi)
+
+`grudge init`이 pi 배선을 설치할 때 `grudge-capture` pi 확장도 `.pi/extensions/grudge-capture/index.ts`에 설치한다. 이 확장은 pi의 `session_shutdown` 훅을 듣고, 세션에서 edit/write 도구가 사용됐으면 백그라운드 pi 검토를 시작해 `lessons/_inbox/` 아래에 lesson 초안을 제안한다.
+
+수동 설치는 `assets/pi/extensions/grudge-capture/index.ts`를 `.pi/extensions/grudge-capture/index.ts`로 복사하면 된다. 끄려면 `GRUDGE_NO_CAPTURE=1`을 설정한다.
+
+Auto-capture는 제안만 한다. lesson을 활성화하거나 병합하거나 승인하지 않는다. 편집이 있었던 세션마다 백그라운드 LLM 실행이 1회 발생할 수 있으므로 실제 비용이 드는 편의 기능으로 다뤄야 한다.
+
 ```text
 complaint / failure
         |
