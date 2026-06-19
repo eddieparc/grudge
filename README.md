@@ -44,11 +44,13 @@ npx grudge init --tools claude,codex,opencode,pi,gjc --lessons-dir .grudge/lesso
 
 | Command | Purpose |
 | --- | --- |
-| `npx grudge init` / `bunx grudge init` | Install skills and scaffold the lessons ledger. Options: `--tools claude,codex,opencode,pi,gjc`, `--lessons-dir`, `--yes`. |
+| `npx grudge init` / `bunx grudge init` | Install skills and scaffold the lessons ledger. Options: `--tools claude,codex,opencode,pi,gjc`, `--lessons-dir`, `--yes`, `--hooks`. |
 | `npx grudge lint [path]` | Validate lesson files against the lesson schema gate. |
 | `grudge retrieve --area <a> [--limit n] [--json]` | Read back relevant approved lessons for an area and optionally emit JSON. |
 | `grudge dedup <draft.md> [--json]` | Check a draft lesson for duplicates, vague generalities, and already-covered guidance. |
 | `grudge compact [--json]` | Bundle bloated lesson sets, identify supersede candidates, and surface rule-promotion candidates. |
+| `grudge propose [--json]` | Write one report-only curation proposal bundle: compact clusters, lint recurrence advisories, duplicate-risk pairs, and merge/mechanize/archive/keep suggestions. |
+| `grudge hooks install [--type pre-push|post-commit]` | Install a non-blocking Git hook that runs `grudge propose` and always exits 0. |
 | `grudge --version` | Print the installed grudge version. |
 | `grudge help` | Show CLI help. |
 
@@ -60,14 +62,21 @@ grudge has three layers:
 2. **Agent = hands** — Claude Code, Codex, opencode, pi, gjc, or another harness that performs the actual coding work.
 3. **Ledger = memory** — structured lesson files committed with the project. This is where the “getting smarter” comes from.
 
-It relies on four mechanisms:
+It relies on five mechanisms:
 
 1. **lint** — a schema gate for lesson frontmatter and required body sections.
 2. **retrieve** — relevant lesson read-back injection before work in a matching area.
 3. **dedup** — rejection of duplicate lessons and useless generic advice.
-4. **compact** — consolidation of bloated lesson clusters and candidates for rule promotion. Lessons are superseded, not hard-deleted, and every memory-changing step stays human-approved.
+4. **compact** — consolidation of bloated lesson clusters and candidates for rule promotion.
+5. **propose** — a one-shot, report-only curation bundle that classifies merge, mechanize, archive, and keep candidates. Lessons are superseded, mechanized, or archived only after human approval; grudge never auto-applies those changes.
 
 The `fe-design-refine` skill is the complaint-to-memory loop for frontend work: turn dissatisfaction into structure, fan it out into focused critique, verify the fix, and recover the approved lesson so the same design mistake does not keep coming back.
+
+## Periodic & background proposals
+
+`grudge hooks install` adds a report-only Git hook, defaulting to `pre-push`, that periodically runs `grudge propose`, prints suggestions, and always exits 0. It never blocks commits or pushes.
+
+When a grudge skill is in use, harnesses that support background work can run `grudge propose` in a sub-agent while the main task continues. The result is a human-facing curation queue for merge, mechanize, archive, or keep decisions. Every proposal remains advisory until a person approves and applies it.
 
 ```text
 complaint / failure

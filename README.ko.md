@@ -44,13 +44,15 @@ npx grudge init --tools claude,codex,opencode,pi,gjc --lessons-dir .grudge/lesso
 
 | Command | Purpose |
 | --- | --- |
-| `npx grudge init` / `bunx grudge init` | Install skills and scaffold the lessons ledger. Options: `--tools claude,codex,opencode,pi,gjc`, `--lessons-dir`, `--yes`. |
-| `npx grudge lint [path]` | Validate lesson files against the lesson schema gate. |
-| `grudge retrieve --area <a> [--limit n] [--json]` | Read back relevant approved lessons for an area and optionally emit JSON. |
-| `grudge dedup <draft.md> [--json]` | Check a draft lesson for duplicates, vague generalities, and already-covered guidance. |
-| `grudge compact [--json]` | Bundle bloated lesson sets, identify supersede candidates, and surface rule-promotion candidates. |
-| `grudge --version` | Print the installed grudge version. |
-| `grudge help` | Show CLI help. |
+| `npx grudge init` / `bunx grudge init` | 스킬을 설치하고 lessons 장부를 만든다. Options: `--tools claude,codex,opencode,pi,gjc`, `--lessons-dir`, `--yes`, `--hooks`. |
+| `npx grudge lint [path]` | lesson 파일을 schema gate로 검사한다. |
+| `grudge retrieve --area <a> [--limit n] [--json]` | area에 맞는 승인된 교훈을 다시 읽고 필요하면 JSON으로 출력한다. |
+| `grudge dedup <draft.md> [--json]` | 초안 lesson의 중복, 모호한 일반론, 이미 다룬 지침 여부를 검사한다. |
+| `grudge compact [--json]` | 비대한 lesson 묶음, supersede 후보, 룰 승격 후보를 드러낸다. |
+| `grudge propose [--json]` | compact 클러스터, lint 재발 advisory, 중복 위험 쌍을 한 번에 모아 merge/mechanize/archive/keep 제안을 report-only로 쓴다. |
+| `grudge hooks install [--type pre-push|post-commit]` | `grudge propose`를 실행하고 항상 exit 0으로 끝나는 비차단 Git hook을 설치한다. |
+| `grudge --version` | 설치된 grudge 버전을 출력한다. |
+| `grudge help` | CLI help를 보여준다. |
 
 ## How it works
 
@@ -60,14 +62,21 @@ grudge는 세 층으로 움직인다:
 2. **에이전트 = 손** — 실제 코딩 작업을 수행하는 Claude Code, Codex, opencode, pi, gjc 또는 다른 하네스다.
 3. **장부 = 메모리** — 프로젝트와 함께 커밋되는 구조화된 lesson 파일이다. “똑똑해짐”은 여기서 나온다.
 
-핵심 메커니즘은 네 가지다:
+핵심 메커니즘은 다섯 가지다:
 
 1. **lint** — lesson frontmatter와 필수 본문 섹션을 검사하는 스키마 게이트.
 2. **retrieve** — 해당 area 작업 전에 관련 교훈을 다시 읽어 주입하는 단계.
 3. **dedup** — 중복 교훈과 쓸모없는 일반론을 막는 필터.
-4. **compact** — 비대해진 교훈 묶음을 정리하고 룰 승격 후보를 드러내는 압축 단계. 교훈은 하드삭제하지 않고 supersede하며, 메모리를 바꾸는 모든 단계는 사람 승인을 거친다.
+4. **compact** — 비대해진 교훈 묶음을 정리하고 룰 승격 후보를 드러내는 압축 단계.
+5. **propose** — merge, mechanize, archive, keep 후보를 분류하는 한 번짜리 report-only 큐레이션 묶음. 교훈 supersede, mechanize, archive는 사람 승인 뒤에만 적용하며 grudge가 자동 적용하지 않는다.
 
 `fe-design-refine` 스킬은 프론트엔드 작업을 위한 불만-메모리 루프다. 불만을 구조화하고, 집중된 critique로 fan-out하고, 수정 결과를 검증하고, 승인된 교훈을 회수해서 같은 디자인 실수가 계속 돌아오지 않게 한다.
+
+## Periodic & background proposals
+
+`grudge hooks install`은 기본 `pre-push` report-only Git hook을 추가해 주기적으로 `grudge propose`를 실행하고 제안을 출력하며 항상 exit 0으로 끝난다. 커밋이나 푸시를 막지 않는다.
+
+grudge 스킬 사용 중 백그라운드 작업을 지원하는 하네스는 메인 작업을 막지 않고 sub-agent에서 `grudge propose`를 실행할 수 있다. 결과는 merge, mechanize, archive, keep 결정을 위한 사람용 큐레이션 큐다. 모든 제안은 사람이 승인하고 적용하기 전까지 advisory다.
 
 ```text
 complaint / failure

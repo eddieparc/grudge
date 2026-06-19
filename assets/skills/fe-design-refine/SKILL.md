@@ -80,6 +80,7 @@ diff 요약 + before/after 스크린샷. 사용자 판단 대기.
   - `grudge lint` (스키마·재발신호·area 후보 제안)
 - grep으로 만들 수 있는 교훈은 `the repo audit-checklist/design-system checklist` 룰로 **승격(mechanized)** — 그러면 다음엔 "참고"가 선택이 아니라 검증 실패가 된다. (사람 승인)
 - 주기적으로 `grudge compact` 가 비대해진 레슨의 묶음/승격 후보를 제안(사람 승인, supersede).
+- **(선택) 백그라운드 제안**: 하네스가 백그라운드 sub-agent를 지원하면, 메인 작업을 막지 않고 sub-agent로 `grudge propose`를 돌려 큐레이션 제안(병합/기계화/아카이브 후보)을 수집→사람에게 제시. 제안만, 자동 적용 금지. 하네스별: opencode/gjc=task·subagent, pi=background, 없으면 생략.
 
 ## 검증 계층 ("똑똑해짐"의 정의)
 - **D (승격/supersede 카운터) + B (retrieve 주입 로그)** = 상시 자동 텔레메트리. `artifacts/grudge/` 리포트.

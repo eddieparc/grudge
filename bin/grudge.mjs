@@ -13,11 +13,14 @@ const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const COMMANDS = `grudge ${pkg.version}
 
 Commands:
-  grudge init [--tools <csv>] [--lessons-dir <path>] [--yes]
+  grudge init [--tools <csv>] [--lessons-dir <path>] [--yes] [--hooks]
   grudge lint [path] [--dir <path>] [--json]
   grudge retrieve --area <area> [--limit n] [--json] [--dir <path>]
   grudge dedup <draft.md> [--json] [--dir <path>]
   grudge compact [--json] [--dir <path>]
+  grudge propose [--json] [--dir <path>]
+  grudge hooks install [--type pre-push|post-commit] [--dir <git repo>]
+  grudge hooks uninstall [--type pre-push|post-commit] [--dir <git repo>]
   grudge --version
   grudge help`;
 
@@ -35,6 +38,10 @@ try {
   if (command === "init") process.exit(await init(args));
   if (["lint", "retrieve", "dedup", "compact"].includes(command)) {
     const mod = await import(`../lib/lessons-${command}.mjs`);
+    process.exit(mod.main(args));
+  }
+  if (["propose", "hooks"].includes(command)) {
+    const mod = await import(`../lib/${command}.mjs`);
     process.exit(mod.main(args));
   }
   console.error(`Unknown command: ${command}\n`);
@@ -60,6 +67,7 @@ function parseTools(value) {
 
 async function init(argv) {
   const yes = argv.includes("--yes");
+  const installHooks = argv.includes("--hooks");
   const lessonsDir = takeOption(argv, "--lessons-dir") ?? (existsSync(resolve("docs")) ? "docs/lessons" : "lessons");
   let tools = parseTools(takeOption(argv, "--tools"));
   if (tools.length === 0 && yes) tools = detectTools();
@@ -105,6 +113,25 @@ async function init(argv) {
     skipped.push(lessonsIndex);
   }
 
+  if (installHooks) {
+    const hooks = await import("../lib/hooks.mjs");
+    if (existsSync(resolve(".git"))) {
+      hooks.installHook(resolve("."), "pre-push", (line) => installed.push(line));
+    } else {
+      manual.push("🔧 hooks: skipped because this directory is not a git repo.");
+    }
+  } else if (!yes) {
+    const shouldInstall = await promptYesNo("Install periodic report-only grudge propose hook? (pre-push) [y/N]: ");
+    if (shouldInstall) {
+      const hooks = await import("../lib/hooks.mjs");
+      if (existsSync(resolve(".git"))) {
+        hooks.installHook(resolve("."), "pre-push", (line) => installed.push(line));
+      } else {
+        manual.push("🔧 hooks: skipped because this directory is not a git repo.");
+      }
+    }
+  }
+
   console.log("grudge init complete");
   console.log(`installed: ${installed.length ? installed.join(", ") : "none"}`);
   if (skipped.length) console.log(`skipped existing: ${skipped.join(", ")}`);
@@ -130,6 +157,12 @@ async function promptTools() {
   rl.close();
   const parsed = parseTools(answer);
   return parsed.length ? parsed : ["pi"];
+}
+async function promptYesNo(question) {
+  const rl = createInterface({ input, output });
+  const answer = await rl.question(question);
+  rl.close();
+  return /^y(?:es)?$/i.test(answer.trim());
 }
 
 function copySkill(name, dest, installed, skipped) {
