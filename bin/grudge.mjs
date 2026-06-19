@@ -12,6 +12,9 @@ const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 
 const COMMANDS = `grudge ${pkg.version}
 
+Usage: npx grudge <command>     (no install needed; always latest)
+   or: npm i -g grudge  →  grudge <command>     (global, bare command)
+
 Commands:
   grudge init [--tools <csv>] [--lessons-dir <path>] [--yes] [--hooks]
   grudge lint [path] [--dir <path>] [--json]

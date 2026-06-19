@@ -32,6 +32,12 @@ or:
 bunx grudge init
 ```
 
+`npx`/`bunx` run grudge without a global install, so there is no bare `grudge` command on your PATH. For a bare `grudge` command, install it globally:
+
+```sh
+npm i -g grudge   # then: grudge init, grudge lint, grudge propose, ...
+```
+
 `init` installs the grudge skill assets for the selected coding-agent harnesses and scaffolds the lessons ledger. After that, agents can lint new lessons, retrieve relevant lessons by area, check draft lessons for duplicates, and compact accumulated lessons into tighter approved memory.
 
 Useful init options:

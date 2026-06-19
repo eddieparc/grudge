@@ -32,6 +32,12 @@ npx grudge init
 bunx grudge init
 ```
 
+`npx`/`bunx`는 전역 설치 없이 실행하므로 PATH에 bare `grudge` 명령이 남지 않는다. bare `grudge`를 쓰려면 전역 설치한다:
+
+```sh
+npm i -g grudge   # 이후: grudge init, grudge lint, grudge propose, ...
+```
+
 `init`은 선택한 코딩 에이전트 하네스에 grudge 스킬 자산을 설치하고 lessons 장부를 만든다. 이후 에이전트는 새 교훈을 lint하고, area 기준으로 관련 교훈을 retrieve하고, 초안의 중복 여부를 dedup하고, 쌓인 교훈을 compact해서 더 촘촘한 승인된 메모리로 정리할 수 있다.
 
 유용한 init 옵션:
