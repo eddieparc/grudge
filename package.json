@@ -1,0 +1,31 @@
+{
+  "name": "grudge",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "grudge": "bin/grudge.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "assets",
+    "README*"
+  ],
+  "repository": "github:eddieparc/grudge",
+  "description": "Portable lesson-memory and design-refinement loop that helps AI coding agents remember past mistakes, inject structured lessons into future work, and avoid repeating them.",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "skills",
+    "lessons",
+    "memory",
+    "claude-code",
+    "codex",
+    "opencode",
+    "pi"
+  ]
+}
